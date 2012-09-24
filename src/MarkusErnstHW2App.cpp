@@ -178,19 +178,23 @@ void MarkusErnstHW2App::blur(uint8_t* ar , float a,  float b,  float c,  float d
 };
 
 void MarkusErnstHW2App::keyDown( KeyEvent event ) {
+	//if the key pressed is one of the shapes then set shape to that shape's key
 	if(event.getChar() == 'q' || event.getChar() == 'w'|| event.getChar() == 'e'|| event.getChar() == 'r'|| event.getChar() == 't'|| event.getChar() == 'y'){
 	shape = event.getChar();
 	};
+	// toggle help for ? key
 	if(event.getCode() == 47){
 		if(help == 1)
 			help = 0;
 		else
 			help = 1;
 	};
+	// call reverse list method for key f
 	if(event.getChar() == 'f'){
 		reverse(lst);
 	};
 
+	// for key a move the coresponding shape up in the list
 	if( event.getChar() == 'a' ) {
 		if(shape == 'q'){
 			if(background->next != NULL){
@@ -229,6 +233,8 @@ void MarkusErnstHW2App::keyDown( KeyEvent event ) {
 			};
 		};
     };
+
+	//for key z move the coresponding shape back in the list
 	if( event.getCode() == 'z' ) {
 		if(shape == 'q'){
 			if(background->prev->prev != NULL){
@@ -267,6 +273,7 @@ void MarkusErnstHW2App::keyDown( KeyEvent event ) {
 			};
 		};
     };
+	// for the arrow keys move the selected shape in the right derection
 	if(event.getCode() == 273){
 		if(shape == 'q'){
 		};
@@ -347,13 +354,21 @@ void MarkusErnstHW2App::keyDown( KeyEvent event ) {
 
 void MarkusErnstHW2App::setup()
 {
+	//create surface
 	mySurface_ = new Surface(1024,1024,false);
+	// set variable to toggle help
 	help = 1;
+	//set font of help
 	font = Font( "", 20.0 );
+	//set initial selected shape
 	shape = 'q';
+	// create text for the help
 	text = new TextLayout();
+	//set font of the text
 	text->setFont(font);
+	//set color of the text
 	text->setColor( ColorA( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	//add what the text should say
 	text->addLine("You can select the different shapes by pressing the keys:");
 	text->addLine("	q: Background");
 	text->addLine("	w: Green Rectangle");
@@ -369,11 +384,15 @@ void MarkusErnstHW2App::setup()
 	text->addLine("Other:");
 	text->addLine("	?: Toggle help display on/off");
 	text->addLine("	f: reverses list");
+	// make a surface out of the text
 	tex = text->render(true,true);
 
+	//creat head of shape list
 	lst = new node();
-
+	//temp variable to hold the spot in the list
 	temp = lst;
+
+	//add the shapes and point to them with extra variables so the correct shape can be moved by the user
 	insertAfter(new node(pixelArray,0,0,0,640,480,Color8u(0, 0, 255)),temp,lst);
 
 	background = lst->next;
@@ -394,15 +413,6 @@ void MarkusErnstHW2App::setup()
 	insertAfter(new node(pixelArray,0,225,25,100,100,Color8u(0, 255, 255)),temp,lst);
 	rec2 = temp->next;
 	
-	/*temp = lst;
-	lst->next = new node(pixelArray,0,50,50,50,50,Color8u(0, 255, 0));
-	temp = temp->next;
-	temp->next = new node(pixelArray,1,125,75,50,Color8u(255, 0, 0));
-	temp = temp->next;
-	temp->next = new node(pixelArray,2,250,50,250,100,Color8u(0, 255, 0));
-	temp = temp->next;
-	temp->next = new node(pixelArray,3,300,50,350,50,325,100,Color8u(0, 255, 0));
-	temp = lst;*/
 };
 
 void MarkusErnstHW2App::mouseDown( MouseEvent event )
@@ -411,13 +421,13 @@ void MarkusErnstHW2App::mouseDown( MouseEvent event )
 
 void MarkusErnstHW2App::update()
 {
-	//mySurface_ = new Surface(1024,1024,false);
 	uint8_t* pixelArray = (*mySurface_).getData();
 
-	//background = lst->next;
+	//set temp back to the start of the list of shapes
 	temp = lst;
 	temp = temp->next;
 
+	//draw the shapes in the list
 	while(temp != NULL){
 		if(temp->type == 0){
 			drawRect(pixelArray, temp->x, temp->y, temp->w, temp->h, temp->c);
@@ -432,40 +442,16 @@ void MarkusErnstHW2App::update()
 			drawTri(pixelArray, temp->x, temp->y, temp->w, temp->h, temp->x3, temp->y3, temp->c);
 		};
 		temp = temp->next;
+
+		//blur the image each iteration, so the farther back the shapes are the blurrier they become
 		blur(pixelArray, 1/9.0,  1/9.0,  1/9.0,  1/9.0, 1/9.0,  1/9.0,  1/9.0,  1/9.0,  1/9.0);
 	};
-
-		/*if(temp->type == 0){
-			drawRect(pixelArray, temp->x, temp->y, temp->w, temp->h, temp->c);
-		};
-		if(temp->type == 1){
-			drawCirc(pixelArray, temp->x, temp->y, temp->r, temp->c);
-		};
-		if(temp->type == 2){
-			drawLine(pixelArray, temp->x, temp->y, temp->w, temp->h, temp->c);
-		};
-		if(temp->type == 3){
-			drawTri(pixelArray, temp->x, temp->y, temp->w, temp->h, temp->x3, temp->y3, temp->c);
-		};*/
-		
-
-		/*if(lst->next->type == 0){
-			drawRect(pixelArray, lst->next->x, lst->next->y, lst->next->w, lst->next->h, lst->next->c);
-		};
-		if(lst->next->type == 1){
-			drawCirc(pixelArray, lst->next->x, lst->next->y, lst->next->r, lst->next->c);
-		};
-		if(lst->next->type == 2){
-			drawLine(pixelArray, lst->next->x, lst->next->y, lst->next->w, lst->next->h, lst->next->c);
-		};
-		if(lst->next->type == 3){
-			drawTri(pixelArray, lst->next->x, lst->next->y, lst->next->w, lst->next->h, lst->next->x3, lst->next->y3, lst->next->c);
-		};*/
 
 };
 
 void MarkusErnstHW2App::draw()
 {
+	//show help or shapes
 	if(help == 1){
 	gl::draw(tex);
 	}
